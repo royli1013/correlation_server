@@ -73,7 +73,7 @@ def run_server(port, pool_dir):
     """
     print("Starting server on port {} with pnl pool at '{}'".format(port, pool_dir))
     print("Initializing pnl pool...")
-    pnl_pool = PnlPool(pool_dir)
+    pnl_pool = PnlPool(*pool_dir)
     print("Pool initialized")
     app = Application([
         url(r"/", CorrelationRequestHandler, dict(pool=pnl_pool))
@@ -90,7 +90,7 @@ def run_server(port, pool_dir):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Starts PNL correlation server")
-    parser.add_argument("--path_to_pnls", "--path", action="store", required=True)
+    parser.add_argument("--path_to_pnls", "--path", action="store", nargs="*", required=True)
     parser.add_argument("--port", "-p", action="store", type=int, required=True)
     args = parser.parse_args(sys.argv[1:])
     run_server(args.port, args.path_to_pnls)
