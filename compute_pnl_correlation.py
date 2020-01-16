@@ -23,10 +23,13 @@ if __name__ == "__main__":
     if len(host_port) != 2 or not host_port[1].isdigit():
         raise ValueError("--server {} could not be understood".format(args.server))
 
-    response = send_request(host_port[0],
-                            host_port[1],
-                            CorrelationRequest(PnlPool(*args.pnl),
-                                               start=args.start_date,
-                                               end=args.end_date,
-                                               top=args.top))
-    print(response.to_string)
+    try:
+        response = send_request(host_port[0],
+                                host_port[1],
+                                CorrelationRequest(PnlPool(*args.pnl),
+                                                   start=args.start_date,
+                                                   end=args.end_date,
+                                                   top=args.top))
+        print(response.to_string())
+    except ValueError as err:
+        print("Received the following error from server: " + err)

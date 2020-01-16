@@ -2,6 +2,7 @@
 Module for correlation server
 """
 import argparse
+import logging
 import sys
 import tornado
 from tornado.web import url, Application, RequestHandler
@@ -44,7 +45,12 @@ class CorrelationRequestHandler(RequestHandler):
         expects an CorrelationRequest object in the body
         """
         request = decode_request(self.request.body.decode("utf-8"))
-        correlations = self._pool.get_correlations(request.pnl_data, request.start, request.end)
+        try:
+            correlations = self._pool.get_correlations(request.pnl_data, request.start, request.end)
+        except ValueError as err:
+            self.set_status(500)
+            self.write(err)
+            return
         top_corrs, top_names, col_names = correlations.top_n_corrs_for_col(request.top)
         response = CorrelationResponse(top_corrs, top_names, col_names)
         self.write(build_response(response))
@@ -69,6 +75,7 @@ def run_server(port, pool_dir):
     ])
     app.listen(port)
     try:
+
         tornado.ioloop.IOLoop.current().start()
     except KeyboardInterrupt:
         print("Shutting down server")

@@ -32,9 +32,7 @@ def send_request(host, port, request):
                _RequestField.PNL_DATA: request.pnl_data.to_json()}
     response = requests.post(_build_url(host, port), json=payload)
     if response.status_code != 200:
-        # TODO: use message from server
-        print("Error from server")
-        raise ConnectionError
+        raise ValueError(response.text)
     return decode_response(response.text)
 
 
@@ -51,7 +49,6 @@ def decode_request(request):
     A CorrelationRequest object storing information about client request
     """
     data = json.loads(request)
-    # TODO: Should have all fields (need to check)
     return CorrelationRequest(PnlPool.from_json(data[_RequestField.PNL_DATA]),
                               start=data[_RequestField.START_DATE],
                               end=data[_RequestField.END_DATE],
