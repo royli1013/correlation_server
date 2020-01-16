@@ -1,7 +1,0 @@
-stop server with ctrl c
-
-assumes all data sent is same length and has no missing dates
-
-didnt fix everything from pylint
-
-weird behaviour if only 1 date
