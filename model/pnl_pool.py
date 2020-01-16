@@ -3,7 +3,6 @@ Module for storing pnl files in memory for faster access
 """
 import os
 import json
-import logging
 import time
 import numpy as np
 
@@ -42,16 +41,13 @@ class PnlPool:
         # _dates is N x 1 (sorted) and seen as the column index (dates) for _data
 
         if data is not None and header is not None and dates is not None:
-            # TODO: verify data
             self._data = np.array(data)
             self._header = np.array(header)
             self._dates = np.array(dates)
-            self._log = logging.getLogger(__name__)
             return
 
         if len(dirs_and_files) == 0:
-            self._log.error("Initialization failed due to no file/directory specified")
-            raise ValueError("Cannot initialize pool with no directories or files specified")
+            raise ValueError("Cannot initialize pnl pool with no directories or files specified")
 
         file_paths = []
         for file_or_dir in dirs_and_files:
@@ -62,17 +58,17 @@ class PnlPool:
                     file_paths += [os.path.join(root, file) for file in files]
             else:
                 file_paths.append(file_or_dir)
-        logging.info("Found {} pnl files to read in".format(len(file_paths)))
+        print("Found {} pnl files to read in".format(len(file_paths)))
         if len(file_paths) == 0:
             raise ValueError("No pnl file found. Cannot create empty pnl pool")
 
         self._dates = None
-        logging.info("Reading in files...")
+        print("Reading in files...")
         start_time = time.time()
         self._data = np.array([self._read_file(filename, start, end) for filename in file_paths])
-        end_time = time.time()
-        logging.info("Read in {} files in {} seconds".format(len(file_paths), end_time-start_time))
+        print("Read in {} files in {:.4f}s".format(len(file_paths), time.time() - start_time))
         self._header = np.array([os.path.basename(filename) for filename in file_paths])
+        #print(self.as_matrix_for_days())
 
     def as_matrix(self):
         """

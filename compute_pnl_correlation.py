@@ -32,4 +32,4 @@ if __name__ == "__main__":
                                                    top=args.top))
         print(response.to_string())
     except ValueError as err:
-        print("Received the following error from server: " + err)
+        print("Received the following error from server: " + str(err))

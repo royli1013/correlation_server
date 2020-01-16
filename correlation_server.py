@@ -2,8 +2,8 @@
 Module for correlation server
 """
 import argparse
-import logging
 import sys
+import time
 import tornado
 from tornado.web import url, Application, RequestHandler
 
@@ -36,7 +36,6 @@ class CorrelationRequestHandler(RequestHandler):
         ----------
         pool PnlPool object to use for the server
         """
-        print("Instance created")
         self._pool = pool
 
     def post(self):
@@ -44,14 +43,20 @@ class CorrelationRequestHandler(RequestHandler):
         We will only be accepting POST requests and
         expects an CorrelationRequest object in the body
         """
+        print("Received new correlations request")
         request = decode_request(self.request.body.decode("utf-8"))
         try:
+            start_time = time.time()
             correlations = self._pool.get_correlations(request.pnl_data, request.start, request.end)
+            print("Calculated correlations in {0:.4f}s".format(time.time() - start_time))
         except ValueError as err:
+            print("Could not calculate correlation due to " + str(err))
             self.set_status(500)
-            self.write(err)
+            self.write(str(err))
             return
+        start_time = time.time()
         top_corrs, top_names, col_names = correlations.top_n_corrs_for_col(request.top)
+        print("Got top {0} correlations in {1:.4f}s".format(request.top, time.time() - start_time))
         response = CorrelationResponse(top_corrs, top_names, col_names)
         self.write(build_response(response))
 

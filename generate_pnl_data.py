@@ -42,25 +42,25 @@ def generate_data(dir_name, num_files):
     alpha_idea_indices = np.random.randint(IDEAS, size=num_files, dtype="int8")
     alphas_raw = normal_as_float32((num_files, DAYS, INSTRUMENTS)) * 0.02  # noise
     alphas_raw += np.take(observed_signals, alpha_idea_indices, axis=0)  # noise + signal
-    print("Generated raw alphas in {0:.4f}".format(time.time() - start_time))
+    print("Generated raw alphas in {0:.4f}s".format(time.time() - start_time))
 
     lambdas = np.random.uniform(low=0.0, high=1.0, size=num_files).astype("float32")
     start_time = time.time()
     alphas_smoothed = apply_smoothing(alphas_raw, lambdas)
     del alphas_raw
-    print("Applied smoothing in {0:.4f}".format(time.time() - start_time))
+    print("Applied smoothing in {0:.4f}s".format(time.time() - start_time))
 
     start_time = time.time()
     pnls = calculate_pnls(alphas_smoothed, total_returns)
-    print("Calculated pnls in {0:.4f}".format(time.time() - start_time))
+    print("Calculated pnls in {0:.4f}s".format(time.time() - start_time))
 
     start_time = time.time()
     tvrs = calculate_turnovers(alphas_smoothed)
-    print("Calculated turnovers in {0:.4f}".format(time.time() - start_time))
+    print("Calculated turnovers in {0:.4f}s".format(time.time() - start_time))
 
     start_time = time.time()
     write_to_directory_parallel(dir_name, dates, pnls, tvrs)
-    print("Wrote to files in {0:.4f}".format(time.time() - start_time))
+    print("Wrote to files in {0:.4f}s".format(time.time() - start_time))
 
 
 def generate_dates(start_date, n):
